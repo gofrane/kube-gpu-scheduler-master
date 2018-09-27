@@ -23,7 +23,7 @@ func main() {
 
 clientset,_:= client.CreateClient("")
 	//  Scale our replication controller.
-	fmt.Printf("Scaling replication controller ", clientset)
+	fmt.Printf("clienset", clientset)
 
 
 
