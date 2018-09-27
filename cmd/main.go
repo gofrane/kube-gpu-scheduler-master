@@ -1,37 +1,47 @@
+// Example showing how to patch kubernetes resources.
 package main
 
 import (
 	"fmt"
 
-	"kube-gpu-scheduler-master/pkg/kube-gpu-scheduler/client"
-	nodeutil "kube-gpu-scheduler-master/pkg/kube-gpu-scheduler/node"
-	podutil "kube-gpu-scheduler-master/pkg/kube-gpu-scheduler/pod"
-	resourceutil "kube-gpu-scheduler-master/pkg/kube-gpu-scheduler/resource"
+	"k8s.io/client-go/kubernetes"
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
+var (
+	//  Leave blank for the default context in your kube config.
+	context = ""
+
+
+)
+
+//  patchStringValue specifies a patch operation for a string.
+type patchStringValue struct {
+	Op    string `json:"op"`
+	Path  string `json:"path"`
+	Value string `json:"value"`
+}
+
+
+
 func main() {
-	clientset, erro := client.CreateClient()
-	if erro != nil {
-		fmt.Println(erro)
-	}
-	stopChannel := make(chan struct{})
-	nodes, err := nodeutil.ReadyNodes(clientset, stopChannel)
+	//  Get the local kube config.
+	fmt.Printf("Connecting to Kubernetes Context %v\n", context)
+	config, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		clientcmd.NewDefaultClientConfigLoadingRules(),
+		&clientcmd.ConfigOverrides{CurrentContext: context}).ClientConfig()
 	if err != nil {
-		fmt.Println(err)
+		panic(err.Error())
 	}
-	narm := resourceutil.NamespaceResourceMap{}
-	ncm := resourceutil.NamespaceCPUMap{}
-	nmm := resourceutil.NamespaceMemoryMap{}
-	ngm := resourceutil.NamespaceGPUMap{}
-	for _, node := range nodes {
-		pods, err := podutil.ListPodsOnANode(clientset, node)
-		if err != nil {
-			fmt.Println(err)
-		}
-		narm = resourceutil.ResourceListerforPod(pods, narm, ncm, nmm, ngm)
+
+	// Creates the clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		panic(err.Error())
 	}
-	fmt.Println("Resource Map:",narm)
-	fmt.Println("CPU Map:",ncm)
-	fmt.Println("GPU Map:", ngm)
-	fmt.Println("Memory Map:", nmm)
+
+	//  Scale our replication controller.
+	fmt.Printf("Scaling replication controller ", clientset)
+
 }

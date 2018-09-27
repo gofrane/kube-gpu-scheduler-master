@@ -292,7 +292,6 @@ func (ts *azureTokenSource) refreshToken(token *azureToken) (*azureToken, error)
 	}
 
 	return &azureToken{
-		token:       spt.Token,
 		clientID:    token.clientID,
 		tenantID:    token.tenantID,
 		apiserverID: token.apiserverID,
