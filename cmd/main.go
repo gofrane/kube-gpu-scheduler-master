@@ -6,6 +6,7 @@ import (
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"PHCGS/pkg/kube-gpu-scheduler/client"
+	"k8s.io/client-go/kubernetes"
 )
 
 var (
@@ -20,8 +21,8 @@ var (
 func main() {
 	//  Get the local kube config.
 	fmt.Printf("Connecting to Kubernetes Context %v\n", context)
-
-clientset,_:= client.CreateClient(context)
+var clientset *kubernetes.Clientset
+clientset,_= client.CreateClient(context)
 	//  Scale our replication controller.
 	fmt.Println("clienset", clientset)
 
