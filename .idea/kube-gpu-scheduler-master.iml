@@ -2,6 +2,7 @@
 <module type="WEB_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$/vendor/github.com/logrus" />
     <content url="file://$MODULE_DIR$/vendor/golang.org/x/oauth2/google" />
     <content url="file://$MODULE_DIR$/vendor/k8s.io/client-go/plugin/pkg/client/auth/azure" />
     <orderEntry type="inheritedJdk" />

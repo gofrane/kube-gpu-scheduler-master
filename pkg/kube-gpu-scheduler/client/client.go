@@ -1,38 +1,31 @@
 package client
 
 import (
-	"flag"
-	"fmt"
-	"os"
-
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/kubernetes"
+	"github.com/logrus"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/kubernetes/pkg/client/clientset_generated/clientset"
-
 )
 
-func CreateClient() (clientset.Interface, error) {
-	kubeconfig := ""
-	flag.StringVar(&kubeconfig, "kubeconfig", kubeconfig, "kubeconfig file")
-	flag.Parse()
-	if kubeconfig == "" {
-		kubeconfig = os.Getenv("KUBECONFIG")
+func CreateClient(pathTOCfg string) (*kubernetes.Clientset, error) {
+
+	var config *rest.Config
+	var err error
+
+	if pathTOCfg==""{
+		logrus.Info("using in cluster config")
+		config,err=rest.InClusterConfig()
+		//in cluster access
+
+	}else {
+		logrus.Info("Using out of cluster config")
+		config,err=clientcmd.BuildConfigFromFlags("",pathTOCfg)
 	}
-	var (
-		config *rest.Config
-		err    error
-	)
-	if kubeconfig != "" {
-		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
-	} else {
-		config, err = rest.InClusterConfig()
-	}
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error creating client: %v", err)
-		os.Exit(1)
-	} else {
-		fmt.Printf("Created kubeconfig\n")
+	if err !=nil {
+		return nil,err
+
 	}
 
-	return clientset.NewForConfig(config)
+
+	return kubernetes.NewForConfig(config)
 }
