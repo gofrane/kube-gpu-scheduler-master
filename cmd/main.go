@@ -21,7 +21,7 @@ func main() {
 	//  Get the local kube config.
 	fmt.Printf("Connecting to Kubernetes Context %v\n", context)
 
-clientset,_:= client.CreateClient("")
+clientset,_:= client.CreateClient(context)
 	//  Scale our replication controller.
 	fmt.Println("clienset", clientset)
 
